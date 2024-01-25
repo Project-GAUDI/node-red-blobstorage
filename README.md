@@ -17,4 +17,4 @@ node-red-blobstorageは、下記処理を行うNode-REDのカスタムノード�
 お気づきの点があれば、ぜひIssueにてお知らせください。
 
 ## LICENSE
-This project is licensed under the MIT License, see the LICENSE file for details
+This project is licensed under the MIT License, see the LICENSE file for details.
