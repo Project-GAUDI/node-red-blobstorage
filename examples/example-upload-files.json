@@ -1,0 +1,132 @@
+[
+    {
+        "id": "73491d97.cebea4",
+        "type": "inject",
+        "z": "479f266f.dee738",
+        "name": "実行トリガー",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 60,
+        "wires": [
+            [
+                "9e6760ee.cf4bd"
+            ]
+        ]
+    },
+    {
+        "id": "e49a94c6.3b8388",
+        "type": "upload-files",
+        "z": "479f266f.dee738",
+        "name": "",
+        "connection": "",
+        "container": "",
+        "overwrite": true,
+        "x": 590,
+        "y": 60,
+        "wires": [
+            [
+                "15aaa5bf.14577a"
+            ]
+        ]
+    },
+    {
+        "id": "9e6760ee.cf4bd",
+        "type": "function",
+        "z": "479f266f.dee738",
+        "name": "ファイルパス送信",
+        "func": "msg.payload = [\n    \"/sample/output/test1.csv\",\n    \"/sample/output/test2.csv\"\n];\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 350,
+        "y": 60,
+        "wires": [
+            [
+                "e49a94c6.3b8388"
+            ]
+        ]
+    },
+    {
+        "id": "15aaa5bf.14577a",
+        "type": "debug",
+        "z": "479f266f.dee738",
+        "name": "結果出力",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "469bf3e6.10bdfc",
+        "type": "catch",
+        "z": "479f266f.dee738",
+        "name": "",
+        "scope": [
+            "e49a94c6.3b8388"
+        ],
+        "uncaught": false,
+        "x": 90,
+        "y": 140,
+        "wires": [
+            [
+                "685c1857.9f5788"
+            ]
+        ]
+    },
+    {
+        "id": "63f1e30c.7912fc",
+        "type": "debug",
+        "z": "479f266f.dee738",
+        "name": "エラー出力",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "error",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "685c1857.9f5788",
+        "type": "json",
+        "z": "479f266f.dee738",
+        "name": "エラーログ変換",
+        "property": "error.message",
+        "action": "obj",
+        "pretty": false,
+        "x": 340,
+        "y": 140,
+        "wires": [
+            [
+                "63f1e30c.7912fc"
+            ]
+        ]
+    }
+]
