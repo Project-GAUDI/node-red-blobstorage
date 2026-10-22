@@ -33,3 +33,5 @@ jobs:
     
     - name: install dependencies
       run: npm install
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
