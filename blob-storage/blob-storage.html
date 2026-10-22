@@ -8,7 +8,7 @@
         <input type="text" id="node-input-connection">
     </div>
     <div class="form-row">
-        <label for="node-input-container"><i class="fa fa-cube"></i> コンテナ名</label>
+        <label for="node-input-container" style="white-space: nowrap;"><i class="fa fa-cube"></i> コンテナー名</label>
         <input type="text" id="node-input-container">
     </div>
     <div class="form-row">
@@ -23,8 +23,8 @@
         color: "#FFFFFF",
         defaults: {
             name: { value: "" },
-            connection: { value: "" },
-            container: { value: "" },
+            connection: { value: "", required: true },
+            container: { value: "", required: true },
             overwrite: { value: true }
         },
         inputs: 1,
@@ -50,15 +50,40 @@
     <h3>出力</h3>
         <dl class="message-properties">
             <dt>payload<span class="property-type">文字列</span></dt>
-            <dd>アップロード完了通知</dd>
+            <dd>アップロード結果通知 ※1個でも失敗していたら失敗扱い</dd>
+            <dt>inputMessage<span class="property-type">オブジェクト</span></dt>
+            <dd>入力メッセージ</dd>
+            <dt>succeededPaths<span class="property-type">オブジェクト</span></dt>
+            <dd>アップロード成功した入出力ファイルパス</dd>
+            <dt>succeededPaths.inputPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード成功した入力ファイルパス</dd>
+            <dt>succeededPaths.blobPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード成功した出力ファイルパス</dd>
         </dl>
     
-    <h3>詳細</h3>
+    <h3>例外</h3>
         <p>
-            デプロイ時にエラーが発生した場合は、エラーログを出力します。<br>
-            <code>上書き</code>のチェックを外した場合、重複するBlobが存在すると、エラーとなります。<br>
-            メッセージ受信時にエラーが発生した場合は、catchノードへエラーを送信します。
+            下記の場合、例外を出力します<br>
+            <ul>
+                <li>デプロイ時にエラーが発生
+                <li>メッセージ受信時、メッセージの構成が不正
+                <li>アップロード時、エラーが発生
+            </ul>
+            出力された例外は、catchノードで取得可能です。<br>
+            アップロード時にエラーが発生した場合はノードの出力も同時に行い、catchノードで取得できるメッセージのプロパティも下記が必ず含まれた構成になります。<br>
         </p>
+        <dl class="message-properties">
+            <dt>payload<span class="property-type">オブジェクト</span></dt>
+            <dd>入力メッセージpayload</dd>
+            <dt>failedPaths<span class="property-type">オブジェクト</span></dt>
+            <dd>アップロード失敗した入出力ファイルパス</dd>
+            <dt>failedPaths.inputPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード失敗した入力ファイルパス</dd>
+            <dt>failedPaths.blobPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード失敗したっ出力ファイルパス</dd>
+            <dt>error<span class="property-type">オブジェクト</span></dt>
+            <dd>アップロード失敗エラー情報</dd>
+        </dl>
 </script>
 
 <script type="text/x-red" data-template-name="upload-files">
@@ -71,7 +96,7 @@
         <input type="text" id="node-input-connection">
     </div>
     <div class="form-row">
-        <label for="node-input-container"><i class="fa fa-cube"></i> コンテナ名</label>
+        <label for="node-input-container" style="white-space: nowrap;"><i class="fa fa-cube"></i> コンテナー名</label>
         <input type="text" id="node-input-container">
     </div>
     <div class="form-row">
@@ -86,8 +111,8 @@
         color: "#FFFFFF",
         defaults: {
             name: { value: "" },
-            connection: { value: "" },
-            container: { value: "" },
+            connection: { value: "", required: true },
+            container: { value: "", required: true },
             overwrite: { value: true }
         },
         inputs: 1,
@@ -102,25 +127,63 @@
 <script type="text/x-red" data-help-name="upload-files">
     <p>
         <code>msg.payload</code>に指定されたファイルを Azure Blob Storage へアップロードします。<br>
-        Blobパスは、<code>{親ディレクトリ}/{ファイル名}</code>です。
+        入力メッセージで出力Blobパスを指定可能です。<br>
+        入力メッセージで出力Blobパスを指定しなかった場合は、<code>{親ディレクトリ※}/{ファイル名}</code>になります。<br>
+        ※入力メッセージに指定されている入力ファイルの親ディレクトリ名(ファイルの1階層上のみ)<br>
+        &emsp;例) 入力パス：/parent1/parent2/file.txt<br>
+        &emsp;&emsp;&emsp;アップロード後パス：parent2/file.txt<br>
     </p>
     
     <h3>入力</h3>
+        形式1<span style="color: red; font-weight: bold;">(推奨)</span>：入出力ファイルパス両方を指定する
+        <dl class="message-properties">
+            <dt>payload<span class="property-type">オブジェクト</span></dt>
+            <dd>入出力ファイルパス</dd>
+            <dt>payload.inputPathList<span class="property-type">配列</span></dt>
+            <dd>入力ファイルパス</dd>
+            <dt>payload.blobPathList<span class="property-type">配列</span></dt>
+            <dd>出力ファイルパス</dd>
+        </dl>
+        形式2：入力ファイルパスのみを指定する
         <dl class="message-properties">
             <dt>payload<span class="property-type">配列</span></dt>
             <dd>入力ファイルパス</dd>
         </dl>
-    
     <h3>出力</h3>
         <dl class="message-properties">
             <dt>payload<span class="property-type">文字列</span></dt>
-            <dd>アップロード完了通知</dd>
+            <dd>アップロード結果通知 ※1個でも失敗していたら失敗扱い</dd>
+            <dt>inputMessage<span class="property-type">オブジェクト</span></dt>
+            <dd>入力メッセージ</dd>
+            <dt>succeededPaths<span class="property-type">オブジェクト</span></dt>
+            <dd>アップロード成功した入出力ファイルパス</dd>
+            <dt>succeededPaths.inputPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード成功した入力ファイルパス</dd>
+            <dt>succeededPaths.blobPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード成功した出力ファイルパス</dd>
         </dl>
     
-    <h3>詳細</h3>
+    <h3>例外</h3>
         <p>
-            デプロイ時にエラーが発生した場合は、エラーログを出力します。<br>
-            <code>上書き</code>のチェックを外した場合、重複するBlobが存在すると、エラーとなります。<br>
-            メッセージ受信時にエラーが発生した場合は、catchノードへエラーを送信します。
+            下記の場合、例外を出力します<br>
+            <ul>
+                <li>デプロイ時にエラーが発生
+                <li>メッセージ受信時、メッセージの構成が不正
+                <li>アップロード時、エラーが発生
+            </ul>
+            出力された例外は、catchノードで取得可能です。<br>
+            アップロード時にエラーが発生した場合はノードの出力も同時に行い、catchノードで取得できるメッセージのプロパティも下記が必ず含まれた構成になります。<br>
         </p>
+        <dl class="message-properties">
+            <dt>payload<span class="property-type">オブジェクト</span></dt>
+            <dd>入力メッセージpayload</dd>
+            <dt>failedPaths<span class="property-type">オブジェクト</span></dt>
+            <dd>アップロード失敗した入出力ファイルパス</dd>
+            <dt>failedPaths.inputPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード失敗した入力ファイルパス</dd>
+            <dt>failedPaths.blobPathList<span class="property-type">配列</span></dt>
+            <dd>アップロード失敗したっ出力ファイルパス</dd>
+            <dt>error<span class="property-type">オブジェクト</span></dt>
+            <dd>アップロード失敗エラー情報</dd>
+        </dl>
 </script>

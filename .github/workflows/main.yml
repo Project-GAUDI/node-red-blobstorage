@@ -8,30 +8,24 @@ on:
 
 jobs:
   setup-and-install:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+    - uses: actions/checkout@v7
 
     - name: Grant execute permission to edit_packageJSON.sh
       run: chmod +x ./tools/edit_packageJSON.sh
     
-    - name: Edit package.json for gaudi-iot-device
-      run: ./tools/edit_packageJSON.sh
+    - name: Prepare package.json
+      run: ./tools/edit_packageJSON.sh "$VERSION"
       env: 
         VERSION: 0.0.1-test
     
     - name: Set Node.js version
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7
       with:
-        node-version: '18'
-        registry-url: 'https://npm.pkg.github.com/'
-        scope: '@project-gaudi'
-        always-auth: true
-        token: ${{ secrets.GITHUB_TOKEN }}
+        node-version: '24'
     
     - name: install dependencies
       run: npm install
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
