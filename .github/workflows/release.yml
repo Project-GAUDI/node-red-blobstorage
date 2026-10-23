@@ -9,14 +9,17 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+      packages: write
     steps:
     - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
        
     - name: Grant execute permission to edit_packageJSON.sh
       run: chmod +x ./tools/edit_packageJSON.sh
   
-    - name: Prepare package.json
-      run: ./tools/edit_packageJSON.sh "${VERSION#v}"
+    - name: Edit package.json for node-red-blobstorage
+      run: ./tools/edit_packageJSON.sh "$VERSION"
       env: 
         VERSION: ${{ github.event.release.tag_name }}
     
@@ -29,7 +32,9 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: install dependencies
-      run: npm install
+      run: |
+        npm pkg set name="@project-gaudi/node-red-blobstorage"
+        npm install
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
