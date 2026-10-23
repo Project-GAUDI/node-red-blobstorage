@@ -7,6 +7,7 @@ author="Toyota Industries Corporation"
 lisence="MIT"
 # version=${VERSION}
 version='7.0.0'
+url="https://github.com/Project-GAUDI/node-red-blobstorage"
 
 sed -i 's/\"name\": \".*\",/\"name\": \"'"${name}"'\",/g' "${target}"
 sed -i 's/\"version\": \".*\",/\"version\": \"'"${version}"'\",/g' "${target}"
